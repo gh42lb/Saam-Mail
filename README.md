@@ -24,14 +24,13 @@ Saam-Mail is confirmed to work well on both the raspberry pi and the Windows Bee
 * Support for JS8Call and FLDIGI applications
 
 
-## Quick start guide
+## Quick Start Guide
 
 ### Configuration
 Saam-Mail supports JS8Call application and fldigi application. Choose the platform you are going to use then follow the instructions below as appropriate.
 
-#### JS8call configuration
+#### JS8Call Configuration
 
-'''
 JS8Call is configured as follows:
 
 Mode Menu/Enable Auto Reply - checked
@@ -45,26 +44,21 @@ TCP Max Connections: 1 (if using saam-mail only) or 2 (if using saam-mail + js8-
 When you are ready to transmit, adjust the mode speed in JS8 as required (slow, normal, fast, turbo) and make sure
  the TX button at the top right is enabled.
 
-'''
 
-#### FLDIGI configuration:
+#### FLDIGI Configuration:
 
-'''
 The default settings in fldigi work well. 
 If you are having issues connecting, check the xmlrpc settings in fldigi. Make sure Fldigi xmlrpc external api is enabled and the ip and port are set to 127.0.0.1 and 7362 respectively.
 
-'''
 
-#### Python configuration
+#### Python Configuration
 
-'''
 Make sure python 3 is installed along with the following modules: PySimpleGUI, sys, threading, json, random, getopt, datetime, socket, time, select, calendar, gps, crc
 This can be done using the pip3 command for any missing modules e.g. pip3 install pysimplegui
 Please note saam_mail is available for python 3 only.
-'''
 
-### Download the application
-'''
+### Download the Application
+
 #### Windows
 Download the saam_mail.exe file to your chosen directory along with the ICS_Form_Templates.tpl and Standard_Templates.tpl file
 
@@ -75,12 +69,10 @@ make sure the binary is executeable: sudo chmod +x ./saam_mail
 #### Python
 Download the saam-mail python files into your chosen directory along with the ICS_Form_Templates.tpl and Standard_Templates.tpl file
 
-'''
 
 
-### Running the application
+### Running the Application
 
-'''
 running with fldigi using windows binary : .\samm_mail.exe --opmode=fldigi
 running with js8call using windows binary: .\samm_mail.exe --opmode=js8call
 
@@ -106,12 +98,10 @@ if everything is installed correctly, samm_mail will connect to fldigi or js8cal
 Now go to the settings tab and fill out your information.
 At a minimum, this must include your call sign and chosen group name.
 Also make sure one of the template files is loaded into the application on the settings tab
-'''
 
 
 ### Sending your first saam_mail form
 
-'''
 Enter the callsign for the station you wish to connect to in the 'Connect To:' field which is flashing red and green on the main page area.
 
 The receiving station should enter your callsign into the same field on their application.
@@ -126,7 +116,6 @@ Compose a message then click post to outbox
 
 Click the outbox tab then select the message and click send.
 
-'''
 
 
 enjoy :)
