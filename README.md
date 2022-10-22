@@ -1,6 +1,6 @@
 ## Overview
 
-Saam-Mail v1.0.2 Beta release de WH6GGO.
+Saam-Mail v1.0.3 Beta release de WH6GGO.
 
 Saam-Mail allows the transfer of error-corrected emails/forms/messages to groups of stations in real time over ham radio. Saam-Mail uses the SAAMFRAM protocol. 
 
@@ -10,19 +10,19 @@ Saam-Mail is confirmed to work well on both the raspberry pi and the Windows Bee
 
 
 #### Features
-* fully verified error-corrected transfer of messages/forms/email to groups of stations in real time
-* multiple message delivery techniques including push, pull, store and forward, relay, active session, passive mode
-* capable of real time Peer to Peer, Peer to Group, Group to Peer and Group to Group mode communications.
-* uses 'stub' messages to notify the group of any 'pending' messages waiting to be sent.
-* data efficient protocol for increased performance and resilience to adverse band conditions.
-* uses a variety of data compression techniques such as dictionary compression and run length encoding.
-* separation of form content from form template information allowing transfer of only the data content portion. 
-* email style interface with inbox, outbox, relay box and sent box
-* out-of-the-box mesh-node capabilities without any special configuration
-* supports a wide variety of underlying modulations (28 fldigi modes and 4 js8 modes) including JS8, PSK, QPSK, BPSK, DominoEX, 8PSK and Olivia
-* form designer capability with many pre-built ICS form templates and standard templates included.
-* Support for JS8Call and FLDIGI applications
-
+* Critical Messages: Enables transfer of fully verified, error-corrected emails/forms/messages to ham radio stations in real time.
+* Group Communication: Capable of real time Peer to Peer, Peer to Group, Group to Peer** and Group to Group** mode communications.
+* Resilience: Optimized data transfer protocol for increased performance and resilience to adverse band conditions.
+* Integration: Integrates with JS8Call, Fldigi, Winlink and Pat Winlink applications.
+* Cross-Platform: Runs on Windows, Linux and any other platform supporting python + related libraries.
+* Flexibility: Multiple message delivery techniques including push, pull, store and forward, relay, active session, passive mode.
+* Mesh Node: Ad-hoc mesh node functionality provided out-of-the-box, including: relay, hub, gateway, RX or TX end node,
+* Notifications: Stub messages provide notification to the group of any pending messages waiting to be sent.
+* Data Compression: Uses a variety of data compression techniques inluding dictionary compression and run length encoding.
+* Customized Interface: Email style interface with inbox, outbox, relay box and sent box, utilizing notebook style and customized GUI controls.
+* 32 Modulation Modes: Supports a wide variety of underlying modulations (28 fldigi modes and 4 js8 modes) including JS8, PSK, QPSK, BPSK, DominoEX, 8PSK and Olivia.
+* Extendable: Form designer built-in with many pre-built ICS form templates and standard templates included.
+* Please note:- Group to Peer and Group to Group is currently available only with JS8Call
 
 ## Quick Start Guide
 
