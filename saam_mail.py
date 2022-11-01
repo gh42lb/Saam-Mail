@@ -781,6 +781,16 @@ def main():
 
     js = group_arq.form_dictionary.readMainDictionaryFromFile("saamcom_save_data.txt")
 
+    params = js.get("params")
+    group_arq.form_gui.main_heading_background_clr     = params.get('FormHeadingClr')
+    group_arq.form_gui.sub_heading_background_clr      = params.get('FormSubHeadingClr')
+    group_arq.form_gui.numbered_section_background_clr = params.get('NumberedSectionClr')
+    group_arq.form_gui.table_header_background_clr     = params.get('TableHeaderClr')
+
+    group_arq.form_gui.main_heading_text_clr     = params.get('FormHeadingTextClr')
+    group_arq.form_gui.sub_heading_text_clr      = params.get('FormSubHeadingTextClr')
+    group_arq.form_gui.numbered_section_text_clr = params.get('NumberedSectionTextClr')
+    group_arq.form_gui.table_header_text_clr     = params.get('TableHeaderTextClr')
 
     if(group_arq.operating_mode == cn.FLDIGI or group_arq.operating_mode == cn.JSDIGI):
       try:

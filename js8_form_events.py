@@ -16,6 +16,7 @@ import platform
 import calendar
 import xmlrpc.client
 import glob
+import webbrowser
 
 import saam_mail
 import js8_form_gui
@@ -77,6 +78,10 @@ class ReceiveControlsProc(object):
     self.winlink_import = winlink_import.WinlinkImport(debug)
 
     self.editing_table = False
+    self.editing_scrolly_pos = 0
+    self.editing_table_key = ''
+    self.editing_table_entry = None
+    self.editing_table_button = None
 
     self.flash_timer_group1 = 0
     self.flash_toggle_group1 = 0
@@ -325,9 +330,12 @@ class ReceiveControlsProc(object):
     filename    = values['in_tmpl_file']
     
     subject = ''
+
+    self.form_gui.render_disabled_controls = False
+
     window = self.form_gui.createDynamicPopupWindow(formname, form_content, category, msgto, filename, ID, subject, True)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, False)
+    self.form_gui.runPopup(self, dispatcher, window, False, False)
 
     return()
 
@@ -539,7 +547,7 @@ class ReceiveControlsProc(object):
     line_data = str(edit_list[2+line_index]) 		
     self.debug.info_message("data item:" + line_data )
 
-    for x in range (12):
+    for x in range (18):
       field_name = 'combo_element' + str(x+1)
       self.form_gui.window[field_name].update('-')
 
@@ -591,7 +599,7 @@ class ReceiveControlsProc(object):
     new_string = ''
     
     try:
-      for x in range(12):
+      for x in range(18):
         field_name = 'combo_element' + str(x+1)
         if(values[field_name] != '-'):
           if(x > 0):		  
@@ -746,9 +754,12 @@ class ReceiveControlsProc(object):
 
     self.debug.info_message("UNIQUE ID USING UUID IS: " + str(ID) )
     subject = ''
+
+    self.form_gui.render_disabled_controls = False
+
     window = self.form_gui.createDynamicPopupWindow(formname, form_content, category, msgto, filename, ID, subject, True)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, False)
+    self.form_gui.runPopup(self, dispatcher, window, False, False)
 
     return()
 
@@ -885,10 +896,12 @@ class ReceiveControlsProc(object):
 
     """ create a new ID as this message is being edited."""
     ID = self.saamfram.getEncodeUniqueId(self.saamfram.getMyCall())
+
+    self.form_gui.render_disabled_controls = False
    
     window = self.form_gui.createDynamicPopupWindow(formname, form_content, category, msgto, filename, ID, subject, False)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, False)
+    self.form_gui.runPopup(self, dispatcher, window, False, False)
     return
 
   def event_settingslist(self, values):
@@ -1423,9 +1436,12 @@ class ReceiveControlsProc(object):
     self.debug.info_message("UNIQUE ID USING UUID IS: " + str(replyID) )
     
     subject = ''
+
+    self.form_gui.render_disabled_controls = False
+
     window = self.form_gui.createInboxViewReplyWindow(formname, form_content, category, msgto, filename, replyID, subject, True, True, True)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, False)
+    self.form_gui.runPopup(self, dispatcher, window, False, False)
 
 
   def event_inboxviewmsg(self, values):
@@ -1456,9 +1472,11 @@ class ReceiveControlsProc(object):
     self.debug.info_message("UNIQUE ID USING UUID IS: " + str(ID) )
 
     subject = ''
+    self.form_gui.render_disabled_controls = True
+
     window = self.form_gui.createInboxViewReplyWindow(formname, form_content, category, msgto, filename, ID, subject, False, False, False)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, True)
+    self.form_gui.runPopup(self, dispatcher, window, False, True)
 
 
   def event_fordesignerInsertElement(self, values):
@@ -1470,7 +1488,7 @@ class ReceiveControlsProc(object):
     self.debug.info_message("index = " + str(index) + " \n")
 
     start_index = 0
-    end_index = 12
+    end_index = 18
     if(at_before_after == 'At' or at_before_after == 'Before'):
       start_index = index
     elif(at_before_after == 'After'):
@@ -1497,7 +1515,7 @@ class ReceiveControlsProc(object):
     self.debug.info_message("index = " + str(index) + " \n")
 
     start_index = 0
-    end_index = 12
+    end_index = 18
     if(at_before_after == 'At' or at_before_after == 'Before'):
       start_index = index
     elif(at_before_after == 'After'):
@@ -1642,7 +1660,7 @@ class ReceiveControlsProc(object):
     new_string = ''
     
     try:
-      for x in range(12):
+      for x in range(18):
         field_name = 'combo_element' + str(x+1)
         if(values[field_name] != '-'):
           if(x > 0):		  
@@ -1812,6 +1830,16 @@ class ReceiveControlsProc(object):
       self.form_gui.window['btn_inbox_sendacknack'].update(button_color=(wording_color, txbtn_color))
       self.form_gui.window['btn_outbox_sendselected'].update(button_color=(wording_color, txbtn_color))
 
+      self.form_gui.main_heading_background_clr     = values['option_main_heading_background_clr']
+      self.form_gui.sub_heading_background_clr      = values['option_sub_heading_background_clr']
+      self.form_gui.numbered_section_background_clr = values['option_numbered_section_background_clr']
+      self.form_gui.table_header_background_clr     = values['option_table_header_background_clr']
+
+      self.form_gui.main_heading_text_clr     = values['option_main_heading_text_clr']
+      self.form_gui.sub_heading_text_clr      = values['option_sub_heading_text_clr']
+      self.form_gui.numbered_section_text_clr = values['option_numbered_section_text_clr']
+      self.form_gui.table_header_text_clr     = values['option_table_header_text_clr']
+
       self.debug.info_message("DONE COLORS UPDATE\n")
     except:
       self.debug.error_message("Exception in event_colorsupdate: " + str(sys.exc_info()[0]) + str(sys.exc_info()[1] ))
@@ -1976,10 +2004,13 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     self.debug.info_message("UNIQUE ID USING UUID IS: " + str(ID) )
 
     subject = ''
+
+    self.form_gui.render_disabled_controls = True
+
     window = self.form_gui.createInboxViewReplyWindow(formname, form_content, category, msgto, filename, ID, subject, False, False, False)
     dispatcher = PopupControlsProc(self, window)
-    self.form_gui.runPopup(self, dispatcher, window, True)
 
+    self.form_gui.runPopup(self, dispatcher, window, False, True)
 
 
   def event_optionoutboxjs8callmode(self, values):
@@ -2005,6 +2036,9 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     self.debug.info_message("editCell row: " + str(row))
     self.debug.info_message("editCell col: " + str(col))
 
+    #multi_line_row = True
+    multi_line_row = False
+
     def callback2(event, row, col, text, key):
         widget = event.widget
         if key == 'Button-1':
@@ -2026,10 +2060,10 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     def callback(event, row, col, text, key):
         widget = event.widget
 
-        self.editing_table = False
-
         if key == 'Return':
+            self.editing_table = False
             text = widget.get()
+
             print(text)
             metadata = window[table_key].metadata
             self.debug.info_message("editCell metadata: " + str(metadata))
@@ -2037,10 +2071,52 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
             button_widget = button
             button_widget.destroy()
             button_widget.master.destroy()
+        elif key == 'Leave':
+            sys.stdout.write("Leave called")
+
+            if(self.editing_table ==True):
+              sys.stdout.write("EDIT TRUE")
+              entry.destroy()
+              entry.master.destroy()
+              button_widget = button
+              button_widget.destroy()
+              button_widget.master.destroy()
+              self.editing_table = False
+            return
+        elif key == 'FocusOut':
+            self.editing_table = False
+            if(multi_line_row == False):
+              text = widget.get()
+            else:
+              text = widget.get("1.0",sg.tk.END)
+
+            button_widget = button
+            button_widget.destroy()
+            button_widget.master.destroy()
+            self.editing_table = False
         elif key == 'Tab':
+            self.editing_table = False
             text = widget.get()
 
-            self.editCell(window, table_key, row, col+1, values, True)
+            new_table = window[table_key].get()
+            metadata = window[table_key].metadata
+            split_metadata = metadata.split(',')
+            max_num_rows = int(split_metadata[1])
+            max_num_cols = int(split_metadata[2])
+
+            if(col <= max_num_cols-2):
+              self.editCell(window, table_key, row, col+1, values, True)
+            else:
+              if(row <= max_num_rows-1):
+                self.editCell(window, table_key, row+1, 0, values, True)
+              else:
+                new_row = []
+                for col_count in range(max_num_cols):
+                  new_row.append('')
+                self.debug.info_message("editCell metadata: " + str(metadata))
+                new_table.append(new_row)
+                window[table_key].update(values=new_table)
+                self.editCell(window, table_key, row+1, 0, values, True)
 
             print(text)
 
@@ -2066,10 +2142,14 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     self.debug.info_message("istab: " + str(istab))
     self.debug.info_message("editing: " + str(self.editing_table))
     self.debug.info_message("row: " + str(row))
+
+
     if (istab == False and (self.editing_table == True or row <= 0)):
         return
 
+
     self.editing_table = True
+   
     root = window.TKroot
     table = window[table_key].Widget
 
@@ -2081,14 +2161,18 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     widget_x1, widget_y1 = table.winfo_rootx(),table.winfo_rooty()
     self.debug.info_message("editCell widget x1: " + str(widget_x1))
     self.debug.info_message("editCell widget y1: " + str(widget_y1))
+
     table2 = window['popup_main_tab1'].Widget  
     widget_x2, widget_y2 = table2.winfo_rootx(),table2.winfo_rooty()
     self.debug.info_message("editCell widget x2: " + str(widget_x2))
     self.debug.info_message("editCell widget y2: " + str(widget_y2))
 
+    self.editing_scrolly_pos = widget_y2
+    self.editing_table_key = table_key 
+
     self.debug.info_message("editCell widget y1-y2: " + str(widget_y1 - widget_y2))
     self.debug.info_message("editCell widget x1-x2: " + str(widget_x1 - widget_x2))
-    offset_y = (widget_y2 - widget_y3) + (widget_y1 - widget_y2) + 4
+    offset_y = (widget_y2 - widget_y3) + (widget_y1 - widget_y2) + 4 + 35
     offset_x = (widget_x2 - widget_x3) + (widget_x1 - widget_x2) + 5
 
     text = table.item(row, "values")[col]
@@ -2096,10 +2180,15 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
 
     self.debug.info_message("editCell x: " + str(x))
     self.debug.info_message("editCell y: " + str(y))
-
+    self.debug.info_message("text is: " + str(text))
 
     frame = sg.tk.Frame(root)
-    frame.place(x=x+offset_x, y=y+offset_y, anchor="nw", width=width, height=height)
+
+    if(multi_line_row == False):
+      frame.place(x=x+offset_x, y=y+offset_y, anchor="nw", width=width, height=height)
+    else:
+      frame.place(x=x+offset_x, y=y+offset_y, anchor="nw", width=width, height=height*3)
+
     textvariable = sg.tk.StringVar()
     textvariable.set(text)
     metadata = window[table_key].metadata
@@ -2109,24 +2198,35 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     self.debug.info_message("editCell this column type: " + str(this_column))
 
     if('Text' in this_column):
-      entry = sg.tk.Entry(frame, textvariable=textvariable, justify='left')
+      if(multi_line_row == False):
+        entry = sg.tk.Entry(frame, textvariable=textvariable, justify='left')
+      else:
+        entry = sg.tk.Text(frame, width=20, height=3)
+
       entry.pack()
-      entry.select_range(0, sg.tk.END)
-      entry.icursor(sg.tk.END)
+
+      if(multi_line_row == False):
+        entry.select_range(0, sg.tk.END)
+        entry.icursor(sg.tk.END)
     elif('Combo(' in this_column):
       split_string = this_column.split('Combo(')
       split_string2 = split_string[1].split(')')
       list_values = split_string2[0].split(':')
+
       entry = sg.ttk.Combobox(frame, values=list_values)
-      entry.current(0)
+      for item_count in range(len(list_values)):
+        if(list_values[item_count] == text):
+          entry.current(item_count)
       entry.pack()
 
+    """
     #use this for checkbox?????????...
-    #entry = sg.tk.Checkbutton(frame)
-    #entry.pack()
+    entry = sg.tk.Checkbutton(frame)
+    entry.pack()
+    """
 
     frame2 = sg.tk.Frame(root)
-    frame2.place(x=x+offset_x, y=y+offset_y+16, anchor="nw", width=width, height=height)
+    frame2.place(x=x+offset_x, y=y+offset_y-16, anchor="nw", width=width, height=height)
     button = sg.tk.Button(frame2, text='++ Add Rows ++')
     button.pack()
     button.bind("<Button-1>", lambda e, r=row, c=col, t=text, k='Button-1':callback2(e, r, c, t, k))
@@ -2135,6 +2235,42 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     entry.bind("<Return>", lambda e, r=row, c=col, t=text, k='Return':callback(e, r, c, t, k))
     entry.bind("<Escape>", lambda e, r=row, c=col, t=text, k='Escape':callback(e, r, c, t, k))
     entry.bind("<Tab>", lambda e, r=row, c=col, t=text, k='Tab':callback(e, r, c, t, k))
+
+    """ experimental code
+    entry.bind("<FocusOut>", lambda e, r=row, c=col, t=text, k='FocusOut':callback(e, r, c, t, k))
+    entry.bind("<Leave>", lambda e, r=row, c=col, t=text, k='Leave':callback(e, r, c, t, k))
+    frame.bind("<Leave>", lambda e, r=row, c=col, t=text, k='Leave':callback(e, r, c, t, k))
+    window['sgcol'].Widget.bind("<Button-1>", lambda e, r=row, c=col, t=text, k='Leave':callback(e, r, c, t, k))
+    """
+
+    self.editing_table_entry = entry
+    self.editing_table_button = button
+
+
+  def cancelEdit(self):
+    entry = self.editing_table_entry
+    button = self.editing_table_button
+    entry.destroy()
+    entry.master.destroy()
+    button_widget = button
+    button_widget.destroy()
+    button_widget.master.destroy()
+    self.editing_table = False
+    return
+
+  def hasWindowMovedDuringEdit(self, window):
+    self.debug.info_message("hasWindowMovedDuringEdit")
+    if(self.editing_table == True):
+      table = window['popup_main_tab1'].Widget  
+      widget_x1, widget_y1 = table.winfo_rootx(),table.winfo_rooty()
+      self.debug.info_message("widget y1: " + str(widget_y1))
+
+      if(self.editing_scrolly_pos != widget_y1):
+        self.debug.info_message("Window has moved while editing")
+        return True
+
+    return False
+
 
   def fixup_table_headers(self, window, table_key, values):
 
@@ -2229,9 +2365,10 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
       extension = "*.b2f"
       self.debug.info_message("Non-Windows Platform")
 
-    #FIXME TESTING ONLY
-    #extension = "*.mime"
- 
+    """ Test code only
+    extension = "*.mime"
+    """
+
     if(folder != ''):
       self.group_arq.clearWinlinkInboxFiles()
       dir_list = glob.glob(folder + extension)
@@ -2436,9 +2573,12 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
 
       """ create a new ID as this message is being edited."""
       ID = self.saamfram.getEncodeUniqueId(self.saamfram.getMyCall())
+
+      self.form_gui.render_disabled_controls = False
+
       window = self.form_gui.createDynamicPopupWindow(formname, form_content, category, msgto, filename, ID, subject, False)
       dispatcher = PopupControlsProc(self, window)
-      self.form_gui.runPopup(self, dispatcher, window, False)
+      self.form_gui.runPopup(self, dispatcher, window, False, False)
     else:
       self.debug.info_message("event_winlinkoutboxtable. main data: " + main_string_data)
 
@@ -2461,14 +2601,23 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
       ID = self.saamfram.getEncodeUniqueId(self.saamfram.getMyCall())
       msgto = ''
       subject = ''
+
+      self.form_gui.render_disabled_controls = False
+
       window = self.form_gui.createDynamicPopupWindow('EMAIL', form_content, category, msgto, filename, ID, subject, False)
       dispatcher = PopupControlsProc(self, window)
-      self.form_gui.runPopup(self, dispatcher, window, False)
+      self.form_gui.runPopup(self, dispatcher, window, False, False)
 
     self.debug.info_message("event_winlinkoutboxtable LOC10")
 
     return
 
+
+  def event_btnmainareavisitgithub(self, values):
+    self.debug.info_message("event_btnmainareavisitgithub")
+
+    url = "https://github.com/gh42lb"
+    webbrowser.open(url)
 
   def event_comboelement1(self, values):
     self.debug.info_message("COMBO ELEMENT 1\n")
@@ -2517,6 +2666,30 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
   def event_comboelement12(self, values):
     self.debug.info_message("COMBO ELEMENT 12\n")
     self.form_gui.window['in_tmpl_insertelementnumber'].update('12')
+
+  def event_comboelement13(self, values):
+    self.debug.info_message("COMBO ELEMENT 13\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('13')
+
+  def event_comboelement14(self, values):
+    self.debug.info_message("COMBO ELEMENT 14\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('14')
+
+  def event_comboelement15(self, values):
+    self.debug.info_message("COMBO ELEMENT 15\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('15')
+
+  def event_comboelement16(self, values):
+    self.debug.info_message("COMBO ELEMENT 16\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('16')
+
+  def event_comboelement17(self, values):
+    self.debug.info_message("COMBO ELEMENT 17\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('17')
+
+  def event_comboelement18(self, values):
+    self.debug.info_message("COMBO ELEMENT 18\n")
+    self.form_gui.window['in_tmpl_insertelementnumber'].update('18')
 
 
   def event_exit_receive(self, values):
@@ -2632,6 +2805,7 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
       'btn_compose_notreadytoreceive'     : event_btncomposenotreadytoreceive,
       'btn_compose_cancelalreadyhavecopy' : event_btncomposecancelalreadyhavecopy,
       'btn_outbox_viewform'       : event_btnoutboxviewform,
+      'btn_mainarea_visitgithub'  : event_btnmainareavisitgithub,
       
       'combo_element1'            : event_comboelement1,
       'combo_element2'            : event_comboelement2,
@@ -2645,6 +2819,12 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
       'combo_element10'           : event_comboelement10,
       'combo_element11'           : event_comboelement11,
       'combo_element12'           : event_comboelement12,
+      'combo_element13'           : event_comboelement13,
+      'combo_element14'           : event_comboelement14,
+      'combo_element15'           : event_comboelement15,
+      'combo_element16'           : event_comboelement16,
+      'combo_element17'           : event_comboelement17,
+      'combo_element18'           : event_comboelement18,
   }
 
 

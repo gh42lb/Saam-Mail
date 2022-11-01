@@ -63,23 +63,25 @@ def createSimTextElement(self, keyname, t1, text, width, height, pad, sub_layout
   return line
 
 def createPreviewTextElement(self, keyname, t1, text, width, height, pad, sub_layout):
-  line =  text + ' ' * (width - len(text))
+  line =  text + ':' + ' ' * (width - len(text))
   return line
 
 def createInputElement(self, keyname, t1, text, width, height, pad, sub_layout):
 
   t1 = self.replaceFields(t1)
 
+  disabled_field = self.render_disabled_controls
+
   if(height == 1):	  
     if(width>0):
-      line = [sg.InputText(t1 , size=(width, height), font=("Courier New", 9), key=keyname, pad=(0,0), border_width=1 )]
+      line = [sg.InputText(t1 , size=(width, height), font=("Courier New", 9), key=keyname, pad=(0,0), border_width=1, disabled=disabled_field, disabled_readonly_background_color='white' )]
     else:  
-      line = [sg.InputText(t1 , size=(width, height), font=("Courier New", 9), key=keyname, pad=(0,0), border_width=1, expand_x=True )]
+      line = [sg.InputText(t1 , size=(width, height), font=("Courier New", 9), key=keyname, pad=(0,0), border_width=1, expand_x=True, disabled=disabled_field, disabled_readonly_background_color='white' )]
   else:
     if(width>0):
-      line = [sg.MLine(t1, size=(width, height), key=keyname, font=("Courier New", 9), autoscroll=True, pad=(0,0), border_width=1)]
+      line = [sg.MLine(t1, size=(width, height), key=keyname, font=("Courier New", 9), autoscroll=True, pad=(0,0), border_width=1, disabled=disabled_field)]
     else:
-      line = [sg.MLine(t1, size=(width, height), key=keyname, font=("Courier New", 9), autoscroll=True, pad=(0,0), border_width=1, expand_x=True)]
+      line = [sg.MLine(t1, size=(width, height), key=keyname, font=("Courier New", 9), autoscroll=True, pad=(0,0), border_width=1, expand_x=True, disabled=disabled_field)]
 
   return line
 
@@ -145,7 +147,7 @@ def createPreviewComboElement(self, keyname, t1, text, width, height, pad, sub_l
   return line
 
 def createMainHeadingElement(self, keyname, t1, text, width, height, pad, sub_layout):
-  line =  [sg.Text(text, size=(width, height), font=("Courier New", 20), pad=(pad,0), border_width=0, relief = sg.RELIEF_FLAT, expand_x=True, justification ='center', background_color='red')]
+  line =  [sg.Text(text, size=(width, height), font=("Courier New", 20), pad=(pad,0), border_width=0, relief = sg.RELIEF_FLAT, expand_x=True, justification ='center', background_color=self.main_heading_background_clr, text_color=self.main_heading_text_clr)]
   return line
 
 def createSimMainHeadingElement(self, keyname, t1, text, width, height, pad, sub_layout):
@@ -157,7 +159,7 @@ def createPreviewMainHeadingElement(self, keyname, t1, text, width, height, pad,
   return line
 
 def createSubHeadingElement(self, keyname, t1, text, width, height, pad, sub_layout):
-  line =  [sg.Text(text, size=(width, height), font=("Courier New", 14), pad=(pad,0), border_width=0, relief = sg.RELIEF_FLAT, expand_x=True, justification ='center', background_color='green1',text_color='black')]
+  line =  [sg.Text(text, size=(width, height), font=("Courier New", 14), pad=(pad,0), border_width=0, relief = sg.RELIEF_FLAT, expand_x=True, justification ='center', background_color=self.sub_heading_background_clr,text_color=self.sub_heading_text_clr)]
   return line
 
 def createSimSubHeadingElement(self, keyname, t1, text, width, height, pad, sub_layout):
@@ -165,6 +167,21 @@ def createSimSubHeadingElement(self, keyname, t1, text, width, height, pad, sub_
   return line
 
 def createPreviewSubHeadingElement(self, keyname, t1, text, width, height, pad, sub_layout):
+  line =  t1 + ' ' * (width - len(t1))
+  return line
+
+
+def createNumberedSectionElement(self, keyname, t1, text, width, height, pad, sub_layout):
+  height = 1
+  width = len(text)
+  line =  [sg.Text(text, size=(width, height), font=("Courier New", 14), pad=(pad,0), border_width=0, relief = sg.RELIEF_FLAT, background_color=self.numbered_section_background_clr,text_color=self.numbered_section_text_clr)]
+  return line
+
+def createSimNumberedSectionElement(self, keyname, t1, text, width, height, pad, sub_layout):
+  line =  text + 'N' * (width - len(text))
+  return line
+
+def createPreviewNumberedSectionElement(self, keyname, t1, text, width, height, pad, sub_layout):
   line =  t1 + ' ' * (width - len(t1))
   return line
 
@@ -195,10 +212,11 @@ def createPreviewColumnElement(self, keyname, t1, text, width, height, pad, sub_
   return line
 
 
-
-#USE METADATA metadata=<radiogroup>_<# in radio button group>
-#set the key of each radio button to this value
-#when readin, read each radio button until selected is found then skip the rest.
+"""
+USE METADATA metadata=<radiogroup>_<# in radio button group>
+set the key of each radio button to this value
+when readin, read each radio button until selected is found then skip the rest.
+"""
 def createRadioGroupElement(self, keyname, t1, text, width, height, pad, sub_layout):
 
   button_list = text.split(',')
@@ -361,19 +379,26 @@ def createEditableTableElement(self, keyname, t1, text, width, height, pad, sub_
 
   self.debug.info_message('createEditableTableElement col widths: ' + str(col_widths) )
 
+  #select_mode=TABLE_SELECT_MODE_NONE 
+  #TABLE_SELECT_MODE_BROWSE
+  #TABLE_SELECT_MODE_EXTENDED
+
   line = [sg.Table(values=data, headings=headings,
                         col_widths=col_widths,
                         auto_size_columns=False,
                         justification='right',
                         num_rows=height,
+                        #FIXME USED FOR MULTI LINE ROWS IN TABLE
+                        #row_height=60,
                         alternating_row_color='lightgray',
                         key=keyname,
                         expand_x=True,
-                        header_text_color = 'black',
-                        header_background_color = 'cyan',
+                        header_text_color = self.table_header_text_clr,
+                        header_background_color = self.table_header_background_clr,
                         text_color = 'black',
                         background_color = 'white',
                         metadata=meta_value,
+                        #display_row_numbers = True,
                         enable_click_events=True,
                         font=("Courier New", 9),
                         )]
@@ -487,6 +512,16 @@ class FormGui(object):
     self.table_lookup = None
     self.special_chars = '0@'
     self.compose_popup_window = None
+    self.render_disabled_controls = False
+
+    self.main_heading_background_clr     = 'red'
+    self.sub_heading_background_clr      = 'green1'
+    self.numbered_section_background_clr = 'yellow'
+    self.table_header_background_clr     = 'cyan'
+    self.main_heading_text_clr           = 'white'
+    self.sub_heading_text_clr            = 'black'
+    self.numbered_section_text_clr       = 'black'
+    self.table_header_text_clr           = 'black'
 
     """ form designed debug code is verbose see notch this back to ERROR level unless needed"""
     self.debugForms = db.Debug(cn.DEBUG_ERROR)
@@ -575,19 +610,18 @@ class FormGui(object):
     #""" main heading control code """
     '0B'    : 'MainHeading',
 
-    #""" repeat next field x number of times"""
-    '0C'    : '2xField Repeat',
-    '0D'    : '3xField Repeat',
-    '0E'    : '4xField Repeat',
+    #""" numbered section text """
+    '0C'    : 'NumberedSection',
+    '0D'    : 'NumberedSection +1',
+    '0E'    : 'NumberedSection -1',
 
-    #""" align line field widths. (anchor line,adjustment line) relative values """
-    '0F'    : 'LineAlign 1,-1',
+    #""" number the column headings automatically """
+    '0F'    : 'NumberedSecTable',
 
     #""" add a filler field that spans number of filelds on relative line index """
     '0G'    : 'FillerSpan 5,-1',
     '0H'    : 'FillerSpan 5,1',
-    #'0G'    : 'LineAlign 2,-1',
-    #'0H'    : 'LineAlign 3,-1',
+
     '0I'    : 'LineAlign 1,-2',
     '0J'    : 'LineAlign 1,-3',
 
@@ -665,6 +699,40 @@ class FormGui(object):
     '#2'    : 'EditTable 10',
     '#3'    : 'EditTable 20',
     '#4'    : 'EditTable 40',
+
+
+    #%CALLSIGN%
+    '#5'    : 'Macro %CALLSIGN%',
+    #%OPERATORNAME%
+    '#6'    : 'Macro %OPERATORNAME%',
+    #%OPERATORTITLE%
+    '#7'    : 'Macro %OPERATORTITLE%',
+    #%INCIDENTNAME%
+    '#8'    : 'Macro %INCIDENTNAME%',
+    #%DATE%
+    '#9'    : 'Macro %DATE%',
+    #%TIME%
+    '#A'    : 'Macro %TIME%',
+    #%DATETIME%
+    '#B'    : 'Macro %DATETIME%',
+    #%LOCALTIME%
+    '#C'    : 'Macro %ZULUTIME%',
+    #%ZULUTIME%
+    '#D'    : 'Macro %ZULUDATETIME%',
+    #%UTCTIME%
+    '#E'    : 'Macro %UTCTIME%',
+    #%UTCTIME%
+    '#F'    : 'Macro %UTCDATETIME%',
+    #%GROUPNAME%
+    '#G'    : 'Macro %GROUPNAME%',
+    #%GPSLAT%
+    '#H'    : 'Macro %GPSLAT%',
+    #%GPSLONG%
+    '#I'    : 'Macro %GPSLONG%',
+    #%GRIDSQUARE%
+    '#J'    : 'Macro %GRIDSQUARE%',
+    #%QTHLOCATION%
+    '#K'    : 'Macro %QTHLOCATION%',
 
 
 
@@ -763,7 +831,7 @@ class FormGui(object):
     'C2'    : 'Ch#',
     'C3'    : 'Channel Name',
     'C4'    : 'COMMUNICATIONS LOG (ICS 309)',
-    'C5'    : 'Contact e.g. Phone / Pager / RF',
+    'C5'    : 'Contact (e.g. \nPhone, Pager,\nradio frequency, etc)',
     'C6'    : 'Communications (radio and/or phone contact numbers needed for this assignment)',
     'C7'    : 'Chief',
     'C8'    : 'Communications Unit',
@@ -773,7 +841,8 @@ class FormGui(object):
     'CC'    : 'Cost',
     'CD'    : 'Communications Resource Availability Worksheet (ICS 217A)',
     'CE'    : 'Channel Configuration',
-    'CF'    : 'Channel Name / Trunked\nRadio System Talkgroup',
+    'CF'    : 'Channel Name /\nTrunked Radio\nSystem Talkgroup',
+    'CG'    : 'Comments',
 
 
 
@@ -793,6 +862,7 @@ class FormGui(object):
     'DE'    : 'Delivery / Reporting Location',
     'DF'    : 'Description',
     'DG'    : 'Date / Time (Optional)',
+    'DH'    : '(Date / Time) From',
     
 
     'E1'    : 'Express Sender',
@@ -851,6 +921,7 @@ class FormGui(object):
     'IN'    : 'ICS Section',
     'IO'    : 'ICS Position',
     'IP'    : 'Information,Read Soon,READ NOW',
+    'IQ'    : 'Individual Name',
 
     'K1'    : 'Kind',
 
@@ -874,18 +945,20 @@ class FormGui(object):
     'M8'    : 'Medical Plan (ICS 206)',
     'M9'    : 'Mitigations',
     'MA'    : 'Major Events',
+    'MB'    : 'Method(s) of contact\nradio frequency\nphone, cell#, etc',
 
     'N1'    : 'Name / Contact Number(s)',
-    'N2'    : '# or Persons',
+    'N2'    : '# or\nPersons',
     'N3'    : 'Notes',
     'N4'    : 'Name / Function',
     'N5'    : 'Name',
     'N6'    : 'No',
-    'N7'    : 'New Status',
+    'N7'    : 'New Status:Combo(---:Available:Assigned:OUT OF SERVICE)',
     'N8'    : 'Needed Date / Time (local 24 hr)',
     'N9'    : 'Name of Supplier',
     'NA'    : 'Name of Auth Logistics Rep',
     'NB'    : 'Notable Activities',
+    'NC'    : 'N or W',
 
     'O1'    : 'Operator Name',
     'O2'    : 'Operational Period',
@@ -901,7 +974,7 @@ class FormGui(object):
 
     'P1'    : 'Position / Title',
     'P2'    : 'Page #',
-    'P3'    : 'Primary Contact',
+    'P3'    : 'Primary Contact. Indicate\ncell, pager or radio\n(frequency/system/channel)',
     'P4'    : 'Prepared by',
     'P5'    : 'Planning Section',
     'P6'    : 'Public Info Officer',
@@ -916,12 +989,14 @@ class FormGui(object):
 	
     'Q1'    : 'Qty',
     'Q2'    : 'Quick Message',
+    'Q3'    : '---,Available,Assigned,OUT OF SERVICE',
+    'Q4'    : '---,VHF LOW,VHF HIGH,UHF,700,800,HF,OTHER',
 
     'R1'    : 'RX Freq',
     'R2'    : 'RX Tone',
     'R3'    : 'Remarks',
-    'R4'    : 'Resources Assigned',
-    'R5'    : 'Reporting Location',
+    'R4'    : 'Resources Assigned\nResource Identifier',
+    'R5'    : 'Reporting Location, Special\nEquipment and Supplies,\nRemarks, Notes, Information',
     'R6'    : 'Resource Unit',
     'R7'    : 'Resource Status Change (ICS 210)',
     'R8'    : 'Resource #',
@@ -932,8 +1007,9 @@ class FormGui(object):
     'RD'    : 'Requested by Name / Position',
     'RE'    : 'Routine',
     'RF'    : 'Reply / Comments from Finance',
-    'RG'    : 'RX Freq N/W',
+    'RG'    : 'RX\nFreq',
     'RH'    : 'RX\nTone/NAC',
+    'RI'    : 'RX\nN or W',
 
     'S1'    : 'Subject',
     'S2'    : 'Station ID',
@@ -954,6 +1030,8 @@ class FormGui(object):
     'SH'    : 'Section Chief Name for Approval',
     'SI'    : 'Supplier Phone / Fax / Email',
     'SJ'    : 'Send to Address',
+    'SK'    : 'Station ID\nFrom',
+    'SL'    : 'Station ID\nTo',
     
     'T1'    : 'To (Name/Position)',
     'T2'    : 'Time',
@@ -973,11 +1051,12 @@ class FormGui(object):
     'TG'    : 'Trauma\nCenter',
     'TH'    : 'Time and Date of Change',
     'TI'    : 'Type',
-    'TJ'    : 'TX Freq N/W',
+    'TJ'    : 'TX\nFreq',
     'TK'    : 'TX\nTone/NAC',
     'TL'    : 'Test1,Test2,Test3,test4',
     'TM'    : 'Trauma Center:Combo(No:Yes - Level I:Yes - Level I & II:Yes - Level III:Yes - Level IV)',
     'TN'    : 'Travel Time\nGround',
+    'TO'    : 'TX\nN or W',
 
     'U1'    : 'Urgent',
 
@@ -1064,6 +1143,26 @@ class FormGui(object):
             int_height = 0
             data = [control_type, int_width, int_height, createSubHeadingElement, createSimSubHeadingElement, False, createPreviewSubHeadingElement]		
             self.field_lookup[key] = data
+
+          elif('NumberedSection' in self.field_names.get(key)):
+            int_width  = 0
+            int_height = 0
+            split_string = self.field_names.get(key).split(' ',1)
+            control_type = split_string[0]
+
+            if(len(split_string) == 2):
+              int_width  = int(split_string[1])
+
+            data = [control_type, int_width, int_height, createNumberedSectionElement, createSimNumberedSectionElement, False, createPreviewNumberedSectionElement]		
+            self.field_lookup[key] = data
+
+          elif('NumberedSecTable' in self.field_names.get(key)):
+            int_width  = 0
+            int_height = 0
+            control_type = self.field_names.get(key)
+            data = [control_type, int_width, int_height, createNumberedSectionElement, createSimNumberedSectionElement, False, createPreviewNumberedSectionElement]		
+            self.field_lookup[key] = data
+
           elif('Separator' in self.field_names.get(key)):
             split_string = self.field_names.get(key).split('x',1)
             int_width    = int(split_string[0])
@@ -1107,7 +1206,7 @@ class FormGui(object):
             data = ['', int_width, int_height, createInputElement, createSimInputElement, True, createPreviewInputElement]		
             self.field_lookup[key] = data
           else:  
-            # this is line repeat code
+            # this is line repeat code or dynamic content macro
             int_height = int(split_string2[0])
             data = [split_string2[1], int_width, int_height, createInputElement, createSimInputElement, True, createPreviewInputElement]		
             self.field_lookup[key] = data
@@ -1154,6 +1253,9 @@ class FormGui(object):
           int_height = int(split_string[1])
           control_type = split_string[0]
           data = [control_type, int_width, int_height, createEditableTableElement, createSimEditableTableElement, True, createPreviewEditableTableElement]		
+          self.field_lookup[key] = data
+        elif('Macro' in self.field_names.get(key)):
+          data = [self.field_names.get(key), 0, 0, createTextElement, createSimTextElement, False, createPreviewTextElement]		
           self.field_lookup[key] = data
 
     return
@@ -1268,7 +1370,9 @@ class FormGui(object):
       content = page_dictionary.get('content')
       mytemplate = self.form_dictionary.getTemplateByFormFromTemplateDictionary(retrieved_formname)
       text_render, table_render, actual_render = self.renderPage(mytemplate, use_dynamic_content_macro, content)
-      layout = [ [sg.MLine(text_render, size=(92, 30), key='ml_inbox_view_preview', font=("Courier New", 12), autoscroll=True, expand_x=True, expand_y=True)],]
+
+      layout = actual_render
+
       callsign = self.group_arq.saamfram.getDecodeCallsignFromUniqueId(mainID)
       tab_line = sg.Tab('Page 1' +':' + callsign, layout, title_color='Green', background_color='Blue')
       tab_layout = tab_layout + [tab_line]
@@ -1276,7 +1380,7 @@ class FormGui(object):
     self.tabgrp = [layout_header, [sg.TabGroup([tab_layout], tab_location='centertop', title_color='Blue', tab_background_color='Dark Gray',
                                                background_color='Dark Gray', selected_title_color='Black', selected_background_color='White', expand_x=True, expand_y=True )]]  
 
-    multi_page_window = sg.Window("MY ICS FORM", self.tabgrp, resizable=True, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
+    multi_page_window = sg.Window(formname, self.tabgrp, resizable=True, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
 
     return (multi_page_window)
 
@@ -1300,9 +1404,7 @@ class FormGui(object):
     combo_list_priority = 'Normal,High,Low'.split(',')
 
     layout = [
-          [sg.Button('Cancel'),
-           sg.Button('Post To Outbox', key='btn_prev_post_to_outbox'),
-           sg.Text('Form: ', size=(5, 1) ), 
+          [sg.Text('Form: ', size=(5, 1) ), 
            sg.InputText(formname, size=(15, 1), key='preview_form_type', disabled=True ), 
            sg.Text('MSGID:', size=(6, 1) ), 
            sg.InputText(message_id, size=(21, 1), key='preview_message_id', disabled=True ), 
@@ -1345,12 +1447,13 @@ class FormGui(object):
                        title_color='Blue', tab_background_color='Dark Gray', background_color='Dark Gray', selected_title_color='Black', selected_background_color='White' )]]  
     """
     """ single page tab for now """
+
     self.tabgrp = [[sg.TabGroup([[
                              sg.Tab('Page 1', layout, title_color='Green', background_color=sg.DEFAULT_BACKGROUND_COLOR, key='popup_main_tab1')]],
                        tab_location='centertop',
                        title_color='Blue', tab_background_color='Dark Gray', background_color='Dark Gray', selected_title_color='Black', selected_background_color='White', size=(930,1000) )]]  
     
-    scrollable_tabgrp = [ [sg.Col(self.tabgrp, background_color=sg.DEFAULT_BACKGROUND_COLOR, vertical_alignment = 'top', scrollable=True, expand_x=True, expand_y=True, key='sgcol')] ]
+    scrollable_tabgrp = [[sg.Button('Cancel'), sg.Button('Post To Outbox', key='btn_prev_post_to_outbox')], [sg.Col(self.tabgrp, background_color=sg.DEFAULT_BACKGROUND_COLOR, vertical_alignment = 'top', scrollable=True, expand_x=True, expand_y=True, key='sgcol')] ]
     multi_page_window = sg.Window(formname, scrollable_tabgrp, resizable=True, size=(980,700), default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
 
     self.setComposePopupWindow(multi_page_window)
@@ -1407,6 +1510,8 @@ class FormGui(object):
     table_header_list = []
 
     self.customized_headers=[]
+
+    self.number_section_table_header = False
     
     for read_ahead in range(2):
       field_count = 0
@@ -1415,6 +1520,7 @@ class FormGui(object):
       line_content_count = 0
       row_num = 1
       table_data = []
+      numbered_section_count = 1
 
       """ loop around all of the rows (x)"""
       for x in range (2, len(mytemplate)):
@@ -1562,6 +1668,7 @@ class FormGui(object):
                   content_field_count = content_field_count + 1
                 field_width = len(mylist[0])
                 window_line = window_line + (mylist_intercept[3](self, keyname, form_content[content_count], mylist[0], field_width, 1, 0, None))
+                window_line_text = window_line_text + ' ' + (mylist_intercept[6](self, keyname, form_content[content_count], mylist[0], field_width, 1, 0, None))
                 content_count = content_count + 1  
               elif(intercept_type=='Combo' and read_ahead == 1):
                 self.debugForms.info_message("Combo\n")
@@ -1571,6 +1678,27 @@ class FormGui(object):
                 mylist_intercept = self.field_lookup[intercept_field]
                 field_width = len(mylist[0])
                 window_line = window_line + (mylist_intercept[3](self, keyname, mylist[0], '', field_width, 1, 0, None))
+
+              elif(intercept_type=='Macro' and read_ahead == 1):
+                self.debugForms.info_message("Macro")
+                mylist_intercept = self.field_lookup[intercept_field]
+                keyname = 'content_' + str(content_field_count)
+                content_field_count = content_field_count + 1
+
+                mylist_intercept = self.field_lookup[intercept_field]
+                field_width = int(mylist[1])
+                field_height= 1
+
+                dynamic_content_macro = mylist_intercept[0].split(' ', 1)[1]
+
+                if(content_count >= len(form_content) or form_content[content_count] == ''):
+                  window_line = window_line + (mylist[3](self, keyname, dynamic_content_macro, mylist[0], field_width, field_height, 0, None))
+                  window_line_text = window_line_text + (mylist[6](self, keyname, dynamic_content_macro, mylist[0], field_width, field_height, 0, None))
+                else:
+                  window_line = window_line + (mylist[3](self, keyname, form_content[content_count], mylist[0], field_width, field_height, 0, None))
+                  window_line_text = window_line_text + (mylist[6](self, keyname, form_content[content_count], mylist[0], field_width, field_height, 0, None))
+                content_count = content_count + 1  
+
               elif(intercept_type=='EditTable' and read_ahead == 1):
                 self.debugForms.info_message("EditTable")
 
@@ -1620,16 +1748,24 @@ class FormGui(object):
                     new_content_row = []
                     for col_count in range(numcols_from_header):
                       new_content_row.append('')
-                      header_row.append(table_header_list[col_count].split(':')[0])
+
+                      if(self.number_section_table_header == True):
+                        header_row.append(str(numbered_section_count) + '. ' + table_header_list[col_count].split(':')[0])
+                        numbered_section_count = numbered_section_count + 1
+                      else:
+                        header_row.append(table_header_list[col_count].split(':')[0])
                     """ create 1 empty row"""
                     new_content_table.append(new_content_row)
 
                   self.customized_headers.append(header_row)
+                  self.debugForms.info_message("EditTable LOC5b")
                   window_line = window_line + (mylist_intercept[3](self, keyname, new_content_table, table_header_list, field_width, int(mylist_intercept[2]), 0, None))
+                  self.debugForms.info_message("EditTable LOC5c")
                   window_line_text = window_line_text + (mylist_intercept[6](self, keyname, new_content_table, table_header_list, field_width, int(mylist_intercept[2]), 0, None))
+                  self.debugForms.info_message("EditTable LOC5d")
 
-                  self.debugForms.info_message("EditTable LOC5")
-                  content_count = content_count + 1  
+                  self.number_section_table_header = False
+
 
               elif(intercept_type=='MainHeading' and read_ahead == 1):
                 self.debugForms.info_message("Main Heading\n")
@@ -1719,6 +1855,12 @@ class FormGui(object):
                 intercept_type = mylist[0]
                 intercept_field = field
 
+              elif('Macro ' in mylist[0] and read_ahead == 1):
+                self.debugForms.info_message("Macro. CONTROL CODE  0: " + str(mylist[1]) )
+                intercept_next_field = True
+                intercept_type = 'Macro'
+                intercept_field = field
+
               elif(mylist[0]=='EditTable' and read_ahead == 1):
                 self.debugForms.info_message("EditTable. CONTROL CODE  0: " + str(mylist[1]) )
                 table_header_string = ''
@@ -1738,6 +1880,19 @@ class FormGui(object):
                 intercept_next_field = True
                 intercept_type = mylist[0]
                 intercept_field = field
+
+              elif(mylist[0]=='NumberedSection' and read_ahead == 1):
+                self.debugForms.info_message("NumberedSection. CONTROL CODE  0: " + str(mylist[1]) )
+                field_width = 0
+                numbering_offset = int(mylist[1])
+                window_line = window_line + (mylist[3](self, keyname, '', str(numbered_section_count + numbering_offset) + '.', field_width, 1, text_field_padding, None))
+                numbered_section_count = numbered_section_count + 1
+
+              elif(mylist[0]=='NumberedSecTable' and read_ahead == 1):
+                self.debugForms.info_message("NumberedSecTable. CONTROL CODE  0: " + str(mylist[1]) )
+
+                """ modifier for the next table """
+                self.number_section_table_header = True
 
               elif(mylist[0]=='Separator' and read_ahead == 1):
                 self.debugForms.info_message("Separator. CONTROL CODE  0: " + str(mylist[1]) )
@@ -2110,19 +2265,27 @@ inbox dictionary items formatted as...
     return return_list
 
   def replaceFields(self, message):
-    #FIXME NEED TO DISABLE THIS WHEN FORM DESIGNER ONLY IS SHOWN
-    #message = self.parseIt(message, '%CALLSIGN%', self.window['input_myinfo_callsign'].get().strip() )
-    #message = self.parseIt(message, '%OPERATORNAME%', self.window['input_ncs'].get().strip())
-    #message = self.parseIt(message, '%OPERATORTITLE%', self.window['input_netname'].get().strip())
 
-    #message = self.parseIt(message, '%INCIDENTNAME%', self.window['input_netname'].get().strip())
+    message = self.parseIt3(message, '%DATE%',     datetime.now().strftime('%Y/%m/%d') )
+    message = self.parseIt3(message, '%TIME%',     datetime.now().strftime('%H:%M') )
+    message = self.parseIt3(message, '%DATETIME%', datetime.now().strftime('%Y/%m/%d %H:%M') )
+    message = self.parseIt3(message, '%ZULUTIME%',     datetime.utcnow().strftime('%H:%MZ') )
+    message = self.parseIt3(message, '%ZULUDATETIME%', datetime.utcnow().strftime('%Y/%m/%d %H:%MZ') )
+    message = self.parseIt3(message, '%UTCTIME%',      datetime.utcnow().strftime('%H:%M UTC') )
+    message = self.parseIt3(message, '%UTCDATETIME%',  datetime.utcnow().strftime('%Y/%m/%d %H:%M UTC') )
 
-    #message = self.parseIt(message, '%DATE%', self.window['input_netname'].get().strip())
-    #message = self.parseIt(message, '%TIME%', self.window['input_netname'].get().strip())
-    #message = self.parseIt(message, '%DATETIME%', self.window['input_netname'].get().strip())
+    if(self.group_arq.formdesigner_mode == False):
+      message = self.parseIt(message, '%CALLSIGN%', self.window['input_myinfo_callsign'].get().strip() )
+      message = self.parseIt(message, '%OPERATORNAME%', self.window['input_myinfo_operator_name'].get().strip())
+      message = self.parseIt(message, '%OPERATORTITLE%', self.window['input_myinfo_operator_title'].get().strip())
+      message = self.parseIt(message, '%INCIDENTNAME%', self.window['input_myinfo_incident_name'].get().strip())
 
-    #message = self.parseIt3(message, '%LOCALTIME%', "{hours:02d}:{minutes:02d}".format(hours=self.js8net.time_now.hour, minutes=self.js8net.time_now.minute) )
-    #message = self.parseIt3(message, '%ZULUTIME%', "{hours:02d}:{minutes:02d}".format(hours=self.js8net.utc_time_now.hour, minutes=self.js8net.utc_time_now.minute) )
+      message = self.parseIt(message, '%GROUPNAME%', self.window['input_myinfo_group_name'].get().strip())
+      message = self.parseIt(message, '%GPSLAT%', self.window['input_myinfo_gpslat'].get().strip())
+      message = self.parseIt(message, '%GPSLONG%', self.window['input_myinfo_gpslong'].get().strip())
+      message = self.parseIt(message, '%GRIDSQUARE%', self.window['input_myinfo_gridsquare'].get().strip())
+      message = self.parseIt(message, '%QTHLOCATION%', self.window['input_myinfo_location'].get().strip())
+
     return message
 
   """
@@ -2243,6 +2406,14 @@ inbox dictionary items formatted as...
           sg.Combo(self.table_lookup, key='combo_element10', enable_events=True, size=(18, 1)),
           sg.Combo(self.table_lookup, key='combo_element11', enable_events=True, size=(18, 1)),
           sg.Combo(self.table_lookup, key='combo_element12', enable_events=True, size=(18, 1))],
+         [
+          sg.Text('Fields 13-18:', size=(10, 1) ),
+          sg.Combo(self.table_lookup, key='combo_element13', enable_events=True, size=(18, 1)),
+          sg.Combo(self.table_lookup, key='combo_element14', enable_events=True, size=(18, 1)),
+          sg.Combo(self.table_lookup, key='combo_element15', enable_events=True, size=(18, 1)),
+          sg.Combo(self.table_lookup, key='combo_element16', enable_events=True, size=(18, 1)),
+          sg.Combo(self.table_lookup, key='combo_element17', enable_events=True, size=(18, 1)),
+          sg.Combo(self.table_lookup, key='combo_element18', enable_events=True, size=(18, 1))],
 
     ]
     
@@ -2413,7 +2584,7 @@ Cont-4/500,Cont-16/1K,OLIVIA-4/1K'.split(',')
 
 
     about_text = '\n\
-                                                Saam-Mail de WH6GGO v1.0.3 Beta \n\
+                                                Saam-Mail de WH6GGO v1.0.4 Beta \n\
 \n\
 \n\
 Saam-Mail and SAAMFRAM Protocol Copyright (c) 2022 Lawrence Byng. MIT License details included below for reference (scroll down)\n\
@@ -2487,7 +2658,7 @@ SOFTWARE.\n'
            sg.Button('Export', size=(10, 1), key='btncli_clear', visible = False),
            sg.InputText('myfile.dat', key='sidebar_offset', size=(15, 1), visible=False),
            sg.Combo(combo_reply_tmplts, key='option_inbox_reply_template', enable_events=True, visible = False),
-           sg.Button('Reply', size=(7, 1), key='btn_inbox_replytomsg', visible = False)],
+           sg.Button('Reply', size=(7, 1), key='btn_inbox_replytomsg', visible = True)],
 
           [sg.Text('Error Frames:', size=(12, 1), visible = False),
            sg.InputText('', key='in_inbox_errorframes', size=(15, 1), visible = False),
@@ -2581,14 +2752,15 @@ SOFTWARE.\n'
           [
            sg.InputText('', key='in_outbox_resendframes', size=(30, 1), visible = False),
            sg.InputText('', key='in_outbox_confirmcallsign', size=(30, 1), visible = False)],
-          [sg.Table(values=[], headings=['Preview'],
-                            max_col_width=116,
-                            col_widths=[116],
+          [sg.Table(values=[], headings=[''],
+                            max_col_width=136,
+                            col_widths=[136],
                             auto_size_columns=False,
                             text_color='black',
                             background_color='white',
                             justification='left',
                             enable_events=True,
+                            vertical_scroll_only=False,
                             select_mode=sg.TABLE_SELECT_MODE_EXTENDED,
                             num_rows=cn.PREVIEW_NUM_ROWS_OUTBOX, key='table_outbox_preview', font=("Courier New", 10))],
        ] 
@@ -2748,11 +2920,31 @@ SOFTWARE.\n'
                          sg.OptionMenu(option_colors, key='option_colors_colors_tab', default_value=js.get("params").get('ColorsTabClr')),
                          sg.Text('Settings Tab', size=(20, 1) ), 
                          sg.OptionMenu(option_colors, key='option_colors_settings_tab', default_value=js.get("params").get('SettingsTabClr'))],
+
+                        [sg.Text('Main Heading Background', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_main_heading_background_clr', default_value=js.get("params").get('FormHeadingClr')),
+                         sg.Text('Main Heading Text', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_main_heading_text_clr', default_value=js.get("params").get('FormHeadingTextClr'))],
+                        [sg.Text('Sub Heading Background', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_sub_heading_background_clr', default_value=js.get("params").get('FormSubHeadingClr')),
+                         sg.Text('Sub Heading Text', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_sub_heading_text_clr', default_value=js.get("params").get('FormSubHeadingTextClr'))],
+                        [sg.Text('Numbered Section Background', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_numbered_section_background_clr', default_value=js.get("params").get('NumberedSectionClr')),
+                         sg.Text('Numbered Section Text', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_numbered_section_text_clr', default_value=js.get("params").get('NumberedSectionTextClr'))],
+                        [sg.Text('Table Header Background', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_table_header_background_clr', default_value=js.get("params").get('TableHeaderClr')),
+                         sg.Text('Table Header Text', size=(20, 1) ), 
+                         sg.OptionMenu(option_colors, key='option_table_header_text_clr', default_value=js.get("params").get('TableHeaderTextClr'))],
+
+
                         [sg.Button('Update',   key='btn_colors_update', size=(6, 1) )], 
                       ] 
 
 
     self.layout_about = [
+                          [sg.Button('Visit Repository', key='btn_mainarea_visitgithub')],
                           [sg.MLine(about_text, size=(64, 20), font=("Courier New", 9),expand_x = True, expand_y=True, disabled = True)], 
                         ] 
 
@@ -2876,21 +3068,22 @@ SOFTWARE.\n'
                        tab_location='centertop',
                        title_color='Blue', tab_background_color='Dark Gray', background_color='Dark Gray', size=(940, 450), selected_title_color='Black', selected_background_color='White', key='tabgrp_main' )], [sg.Button('Exit')]]  
 
-    self.window = sg.Window("SAAM-MAIL de WH6GGO. v1.0.3 Beta", self.tabgrp, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
+    self.window = sg.Window("Saam-Mail de WH6GGO. v1.0.4 Beta", self.tabgrp, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
 
     return (self.window)
 
-  def runPopup(self, form, dispatcher, window, view_only):
+  def runPopup(self, form, dispatcher, window, non_render_view_only, render_disabled_controls):
 
     initialized_headers = False
-    self.editing_table = False
+    self.form_events.editing_table = False
+    self.render_disabled_controls = render_disabled_controls
 
     try:
       while True:
         event, values = window.read(timeout=100)
 
         if(initialized_headers == False):
-          if(view_only == False):
+          if(non_render_view_only == False):
             self.form_events.fixup_table_headers(window, 'content_0', values)
           initialized_headers = True
 
@@ -2899,11 +3092,14 @@ SOFTWARE.\n'
         except:
           if(event == '__TIMEOUT__'):
             self.debug.info_message("Timeout in runPopup")
+            if(self.form_events.hasWindowMovedDuringEdit(window) == True):
+              self.form_events.cancelEdit()
+
           elif(event == 'Close' or event == 'Cancel'):
             self.debug.info_message("Close popup window in runPopup")
           else:
 
-            if isinstance(event, tuple):
+            if self.render_disabled_controls==False and isinstance(event, tuple):
 
               self.debug.info_message("Edit Cell event: " + str(event))
               self.debug.info_message("Edit Cell event[0]: " + str(event[0]))
@@ -2918,9 +3114,11 @@ SOFTWARE.\n'
         if event in ('Close', 'Cancel', 'btn_prev_post_to_outbox', None):
           break
 
+      self.form_events.editing_table = False
       window.close()
     except:
       self.debug.error_message("Exception in runPopup: " + str(sys.exc_info()[0]) + str(sys.exc_info()[1] ))
+      self.form_events.editing_table = False
       window.close()
 
   def runReceive(self, form, dispatcher):

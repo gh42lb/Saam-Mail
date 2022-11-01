@@ -228,7 +228,6 @@ class SAAMFRAM(object):
 
   def createPreMessageRelay(self):
 
-    #FIXME get the messages from the relay box
     items = self.group_arq.getMessageRelaybox()
 
     selected_item = random.choice(items)
@@ -2548,6 +2547,8 @@ outbox dictionary items formatted as...
   def getEncodeUniqueId(self, callsign):
     self.debug.info_message("getEncodeUniqueId\n")
 
+    #FIXME / should also be permitted in call signs
+    #chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/"
     chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     charsLen = len(chars)
     num = 0
@@ -2559,6 +2560,8 @@ outbox dictionary items formatted as...
   """ This method decodes the callsign from the ID string"""
   def getDecodeCallsignFromUniqueId(self, ID):
     """ use the following to reverse the callsign from the ID string to show who created the email"""
+    #FIXME / should also be permitted in call signs
+    #chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/"
     chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     charsLen = len(chars)
     hexnum = '0x' + ID.split('_',1)[0]

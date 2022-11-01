@@ -185,6 +185,8 @@ class FormDictionary(object):
                 'description' : 'my test forms' }
     """
 
+  #FIXME add reply form to the format for a template
+  #def createNewTemplateInDictionary(self, filename, category, formname, version, description, data, reply_formname):
   def createNewTemplateInDictionary(self, filename, category, formname, version, description, data):
 
     self.debug.info_message("createNewTemplateInDictionary 1 \n")
@@ -239,7 +241,6 @@ class FormDictionary(object):
     return (None)
 
   def removeTemplateFromTemplateDictionary(self, filename, category, formname):
-
     details = self.template_file_dictionary_data[filename]
     template_dictionary = details.get(category)		  
     template_dictionary.pop(formname, None)
@@ -464,8 +465,6 @@ class FormDictionary(object):
 
 
   def createRelayboxDictionaryItem(self, ID, msgto, msgfrom, subject, priority, timestamp, formname, confrcvd, fragsize, content, verified):
-
-    #verified = 'yes'
 
     if( ID in self.relaybox_file_dictionary_data):
       self.debug.info_message("createRelayboxDictionaryItem item already exists in relaybox")
@@ -948,7 +947,13 @@ class FormDictionary(object):
                            'AllConfirmedMsgClr'       : 'Red',
                            'NotAllConfirmedMsgClr'    : 'Red',
                            'FormHeadingClr'           : 'Red',
-                           'FormSubHeadingClr'        : 'Red',
+                           'FormSubHeadingClr'        : 'Green1',
+                           'NumberedSectionClr'       : 'Yellow',
+                           'TableHeaderClr'           : 'Cyan',
+                           'FormHeadingTextClr'       : 'white',
+                           'FormSubHeadingTextClr'    : 'black',
+                           'NumberedSectionTextClr'   : 'black',
+                           'TableHeaderTextClr'       : 'black',
                            'FormPreviewBackgroundClr' : 'Red',
 
                            'TxRig'               : 'Rig1',
@@ -1081,8 +1086,14 @@ class FormDictionary(object):
                            'CompleteMsgClr'     : 'Red',  #values[''], 
                            'AllConfirmedMsgClr'       : 'Red',  #values[''],
                            'NotAllConfirmedMsgClr'    : 'Red',  #values[''],
-                           'FormHeadingClr'           : 'Red',  #values[''],
-                           'FormSubHeadingClr'        : 'Red',  #values[''],
+                           'FormHeadingClr'           : values['option_main_heading_background_clr'],
+                           'FormSubHeadingClr'        : values['option_sub_heading_background_clr'],
+                           'NumberedSectionClr'       : values['option_numbered_section_background_clr'],
+                           'TableHeaderClr'           : values['option_table_header_background_clr'],
+                           'FormHeadingTextClr'           : values['option_main_heading_text_clr'],
+                           'FormSubHeadingTextClr'        : values['option_sub_heading_text_clr'],
+                           'NumberedSectionTextClr'       : values['option_numbered_section_text_clr'],
+                           'TableHeaderTextClr'           : values['option_table_header_text_clr'],
                            'FormPreviewBackgroundClr' : 'Red',  #values[''],
 
                            'TxRig'           : 'Red',  #values[''],
