@@ -1374,7 +1374,8 @@ class FormGui(object):
       layout = actual_render
 
       callsign = self.group_arq.saamfram.getDecodeCallsignFromUniqueId(mainID)
-      tab_line = sg.Tab('Page 1' +':' + callsign, layout, title_color='Green', background_color='Blue')
+      #tab_line = sg.Tab('Page 1' +':' + callsign, layout, title_color='Green', background_color='Blue')
+      tab_line = sg.Tab('Page 1' +':' + callsign, layout, title_color='Green', background_color='SlateGray')
       tab_layout = tab_layout + [tab_line]
   
     self.tabgrp = [layout_header, [sg.TabGroup([tab_layout], tab_location='centertop', title_color='Blue', tab_background_color='Dark Gray',
@@ -2584,7 +2585,7 @@ Cont-4/500,Cont-16/1K,OLIVIA-4/1K'.split(',')
 
 
     about_text = '\n\
-                                                Saam-Mail de WH6GGO v1.0.4 Beta \n\
+                                                Saam-Mail de WH6GGO v1.0.5 Beta \n\
 \n\
 \n\
 Saam-Mail and SAAMFRAM Protocol Copyright (c) 2022 Lawrence Byng. MIT License details included below for reference (scroll down)\n\
@@ -2944,7 +2945,7 @@ SOFTWARE.\n'
 
 
     self.layout_about = [
-                          [sg.Button('Visit Repository', key='btn_mainarea_visitgithub')],
+                          [sg.Button('Repository', key='btn_mainarea_visitgithub')],
                           [sg.MLine(about_text, size=(64, 20), font=("Courier New", 9),expand_x = True, expand_y=True, disabled = True)], 
                         ] 
 
@@ -3068,7 +3069,7 @@ SOFTWARE.\n'
                        tab_location='centertop',
                        title_color='Blue', tab_background_color='Dark Gray', background_color='Dark Gray', size=(940, 450), selected_title_color='Black', selected_background_color='White', key='tabgrp_main' )], [sg.Button('Exit')]]  
 
-    self.window = sg.Window("Saam-Mail de WH6GGO. v1.0.4 Beta", self.tabgrp, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
+    self.window = sg.Window("Saam-Mail de WH6GGO. v1.0.5 Beta", self.tabgrp, default_element_size=(40, 1), grab_anywhere=False, disable_close=True)                       
 
     return (self.window)
 

@@ -435,9 +435,11 @@ class NetGarq(object):
       if(selected == 'Verified'):
         selected_colors.append([x, 'green1'])
       elif(selected == 'Stub'):
-        selected_colors.append([x, 'red'])
+        selected_colors.append([x, 'cyan'])
       elif(selected == 'Partial'):
         selected_colors.append([x, 'blue'])
+      elif(selected == 'CRC'):
+        selected_colors.append([x, 'red'])
 
     return selected_colors
 
@@ -504,9 +506,11 @@ class NetGarq(object):
       if(selected == 'Verified'):
         selected_colors.append([x, 'green1'])
       elif(selected == 'Stub'):
-        selected_colors.append([x, 'red'])
+        selected_colors.append([x, 'cyan'])
       elif(selected == 'Partial'):
         selected_colors.append([x, 'blue'])
+      elif(selected == 'CRC'):
+        selected_colors.append([x, 'red'])
 
     return selected_colors
 
@@ -645,7 +649,7 @@ class NetGarq(object):
       self.saamfram.sendFormFldigi(pre_message + fragtagmsg, tolist)
     elif(self.operating_mode == cn.JS8CALL or self.operating_mode == cn.JSDIGI):
       self.debug.info_message("sendFormRig1 JS8\n")
-      self.saamfram.sendFormJS8(fragtagmsg)
+      self.saamfram.sendFormJS8(fragtagmsg, tolist)
 
     
   def my_new_callback2(self, json_string, txrcv):
@@ -711,7 +715,7 @@ def usage():
  
 def main():
 
-    debug = db.Debug(cn.DEBUG_ERROR)
+    debug = db.Debug(cn.DEBUG_INFO)
 
     group_arq = NetGarq(debug)
     group_arq.form_gui = js8_form_gui.FormGui(group_arq, debug)
@@ -794,7 +798,6 @@ def main():
 
     if(group_arq.operating_mode == cn.FLDIGI or group_arq.operating_mode == cn.JSDIGI):
       try:
-        debug = db.Debug(cn.DEBUG_ERROR)
         group_arq.setDebug(debug)
         """ create the rig 1 fldigi instance and give it a name """
         fldigiClient = fldigi_client.FLDIGI_Client(debug, 'kenwood')

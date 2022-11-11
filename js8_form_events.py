@@ -82,6 +82,8 @@ class ReceiveControlsProc(object):
     self.editing_table_key = ''
     self.editing_table_entry = None
     self.editing_table_button = None
+    self.editing_table_row = 0
+    self.editing_table_col = 0
 
     self.flash_timer_group1 = 0
     self.flash_toggle_group1 = 0
@@ -2143,13 +2145,44 @@ MODE 23 - 8PSK125F,MODE 24 - PSK250R,MODE 25 - PSK63RC4,MODE 26 - DOMX22,MODE 27
     self.debug.info_message("editing: " + str(self.editing_table))
     self.debug.info_message("row: " + str(row))
 
-
-    if (istab == False and (self.editing_table == True or row <= 0)):
+    #FIXME
+    if (row <= 0):
+      if (istab == False):
         return
+
+    if (self.editing_table == True):
+      entry = self.editing_table_entry
+      text = entry.get()
+      button = self.editing_table_button
+      entry.destroy()
+      entry.master.destroy()
+      button_widget = button
+      button_widget.destroy()
+      button_widget.master.destroy()
+      self.editing_table = False
+
+
+      table = window[self.editing_table_key].Widget
+      #table = window[table_key].get()
+      list_values = list(table.item(self.editing_table_row, 'values'))
+      list_values[self.editing_table_col] = text
+      table.item(self.editing_table_row, values=list_values)
+
+      self.debug.info_message("editCell row is: " + str(self.editing_table_row))
+      self.debug.info_message("editCell col is: " + str(self.editing_table_col))
+      psgtable = window[self.editing_table_key].get()
+      psgtable_row = psgtable[self.editing_table_row-1]
+      psgtable_row[self.editing_table_col] = text
+      window[self.editing_table_key].update(values=psgtable)
+
+    #  if (istab == False):
+    #    return
 
 
     self.editing_table = True
-   
+    self.editing_table_row = row   
+    self.editing_table_col = col
+
     root = window.TKroot
     table = window[table_key].Widget
 
