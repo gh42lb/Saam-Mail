@@ -1,6 +1,6 @@
 ## Overview
 
-Saam-Mail v1.0.4 Beta release de WH6GGO.
+Saam-Mail v1.0.5 Beta release de WH6GGO.
 
 Saam-Mail allows the transfer of error-corrected emails/forms/messages to groups of stations in real time over ham radio. Saam-Mail uses the SAAMFRAM protocol. 
 
